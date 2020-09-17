@@ -71,12 +71,12 @@ class ccxtClass():
     def account_info(self):
         for key, val in self.sell_buy_coin.items():
             try:
-                self.buy_coin()
+                #self.buy_coin()
                 print(self.exchange_sites_obj_dict[val['buy'][0]].fetch_balance(), 'ok')
             except Exception as e:
                 print('account info def %s:' %e)
             try:
-                self.sell_coin()
+                #self.sell_coin()
                 print(self.exchange_sites_obj_dict[val['sell'][0]].fetch_balance(), 'ok')
             except Exception as e:
                 print('account info def %s:' %e)
