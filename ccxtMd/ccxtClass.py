@@ -23,6 +23,8 @@ class ccxtClass():
         #코인 사고 팔 것
         self.sell_buy_coin = {}
 
+
+
     #마켓 로드 하기 , 마켓을 변수에 할당하기
     def load_coin_market(self):
         for exchange in self.exchange_sites_list:
@@ -64,8 +66,9 @@ class ccxtClass():
                     "gap": per
                 }
             small_dict = {}
-        print(big_dict)
         self.sell_buy_coin = big_dict
+        for key,val in self.sell_buy_coin.items():
+            print("%s : %s" %(key, val))
 
     #잔고 조회 후 코인 거래  +++++++++++++++++++++ 여기에 로직 추가 할 것
     def account_info(self):
