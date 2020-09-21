@@ -67,9 +67,12 @@ class ccxtClass():
                 }
             small_dict = {}
         self.sell_buy_coin = big_dict
+        #print(self.sell_buy_coin)
+        '''
         for key,val in self.sell_buy_coin.items():
             print("%s : %s" %(key, val))
-
+        '''
+        #self.book_buy_sell_price()
     #잔고 조회 후 코인 거래  +++++++++++++++++++++ 여기에 로직 추가 할 것
     def account_info(self):
         for key, val in self.sell_buy_coin.items():
@@ -100,3 +103,32 @@ class ccxtClass():
                 self.exchange_sites_obj_dict[val['sell'][0]].create_limit_sell_order(key, 1, val['sell'][1], {'execInst': 'ParticipateDoNotInitiate'})
             except Exception as e:
                 print('sell def %s:' %e)
+
+
+    def book_buy_sell_price(self):
+        big_dict = dict()
+        small_dict = dict()
+        for coin in self.same_coins_list:
+            for key, val in self.exchange_sites_obj_dict.items():
+                order_book_info = val.fetch_order_book(coin)
+                buy_first = order_book_info['bids'][0][0] ## 매도 1호
+                sell_first = order_book_info['asks'][0][0] ## 매수 1호
+                small_dict[key] = {
+                    "buy" : buy_first,
+                    "sell" : sell_first
+                }
+                #print("site :: %s   ///  coinname :: %s    ///    buy: %s,  sell:%s " %(key, coin, buy_first, sell_first))
+            buy_min = min(small_dict, key=lambda k: small_dict[k]["buy"])
+            sell_max = max(small_dict, key=lambda k: small_dict[k]["sell"])
+            check_same = buy_min == sell_max
+            if check_same:
+                sell_max = sorted(small_dict, key=lambda k: small_dict[k]["sell"], reverse=True)[1]
+            per = (small_dict[sell_max]["sell"]-small_dict[buy_min]["buy"])/small_dict[sell_max]["sell"] * 100
+            if per>self.gap_per:
+                big_dict[coin] ={
+                    "buy": [buy_min, small_dict[buy_min]["buy"]],
+                    "sell": [sell_max, small_dict[sell_max]["sell"]],
+                    "gap": per
+                }
+            small_dict = {}
+        self.sell_buy_coin = big_dict
