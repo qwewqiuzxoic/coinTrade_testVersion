@@ -23,7 +23,9 @@ class ccxtClass():
         #코인 사고 팔 것
         self.sell_buy_coin = {}
 
-
+        #코인 주문 리스트
+        self.buy_book_list = {}
+        self.sell_book_list = {}
 
     #마켓 로드 하기 , 마켓을 변수에 할당하기
     def load_coin_market(self):
@@ -79,7 +81,10 @@ class ccxtClass():
             try:
                 #self.buy_coin()
                 print(self.exchange_sites_obj_dict[val['buy'][0]].fetch_balance(), 'ok')
+
             except Exception as e:
+                print(111111)
+
                 print('account info def %s:' %e)
             try:
                 #self.sell_coin()
@@ -92,7 +97,8 @@ class ccxtClass():
     def buy_coin(self):
         for key, val in self.sell_buy_coin.items():
             try:
-                self.exchange_sites_obj_dict[val['buy'][0]].create_limit_buy_order(key, 1, val['buy'][1], {'execInst': 'ParticipateDoNotInitiate'})
+                order = self.exchange_sites_obj_dict[val['buy'][0]].create_limit_buy_order(key, 1, val['buy'][1], {'execInst': 'ParticipateDoNotInitiate'})
+                self.buy_book_list[key] = order
             except Exception as e:
                 print('buy def %s:' %e)
 
@@ -100,11 +106,31 @@ class ccxtClass():
     def sell_coin(self):
         for key, val in self.sell_buy_coin.items():
             try:
-                self.exchange_sites_obj_dict[val['sell'][0]].create_limit_sell_order(key, 1, val['sell'][1], {'execInst': 'ParticipateDoNotInitiate'})
+                order = self.exchange_sites_obj_dict[val['sell'][0]].create_limit_sell_order(key, 1, val['sell'][1], {'execInst': 'ParticipateDoNotInitiate'})
+                self.sell_book_list[key] = order
             except Exception as e:
                 print('sell def %s:' %e)
 
+    #주문 확인
+    def buy_order_confirm(self):
+        for key, val in self.buy_book_list.items():
+            self.exchange_sites_obj_dict[key].fetch_order(val['info']['orderID'], val['symbol'])
 
+    def sell_order_confirm(self):
+        for key, val in self.sell_book_list.items():
+            self.exchange_sites_obj_dict[key].fetch_order(val['info']['orderID'], val['symbol'])
+
+    #주문 취소
+    def buy_order_cancel(self):
+        print(11)
+        #site.cancel_order(order['info']['orderID'], 'BTC/USD')
+
+    def sell_order_cancel(self):
+        print(11)
+        #site.cancel_order(order['info']['orderID'], 'BTC/USD')
+
+
+    #매도 매수 가격으로 구분
     def book_buy_sell_price(self):
         big_dict = dict()
         small_dict = dict()
